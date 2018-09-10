@@ -28,9 +28,9 @@ func NewCache(size int, expiry time.Duration) *Cache {
 	}
 }
 
-func (c *Cache) IsExpired(ci *CachedItem) bool {
+func (c *Cache) IsExpired(ci CachedItem) bool {
 	if time.Now().Sub(ci.createdAt) < c.expiry {
-		return true
+		return false
 	}
-	return false
+	return true
 }

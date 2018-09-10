@@ -35,7 +35,7 @@ func TestIsExpired(t *testing.T) {
 	}
 	time.Sleep(4 * time.Second)
 
-	res2, ok := c.Cache.Get("hi")
+	res2, ok := c.cache.Get("hi")
 	if !ok {
 		t.Error("Error: could not find key")
 	}
