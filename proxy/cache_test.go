@@ -5,26 +5,29 @@ import (
 	"time"
 )
 
-func TestIsExpired(t *testing.T) {
-	c := NewCache(3, 3*time.Second)
-
-	c.cache.Add(
-		"hello",
+func SetupAndSeedCache(cap int, exp time.Duration) *Cache {
+	c := NewCache(cap, exp)
+	c.lru.Add("hello",
 		CachedItem{
 			value:     "world",
 			createdAt: time.Now(),
 		},
 	)
-	c.cache.Add(
+	c.lru.Add(
 		"hi",
 		CachedItem{
 			value:     "there",
 			createdAt: time.Now(),
 		},
 	)
+	return c
+}
+func TestIsExpired(t *testing.T) {
+	c := SetupAndSeedCache(3, 3*time.Second)
+
 	time.Sleep(1 * time.Second)
 
-	res1, ok := c.cache.Get("hello")
+	res1, ok := c.lru.Get("hello")
 	if !ok {
 		t.Error("Error: could not find key")
 	}
@@ -35,7 +38,7 @@ func TestIsExpired(t *testing.T) {
 	}
 	time.Sleep(4 * time.Second)
 
-	res2, ok := c.cache.Get("hi")
+	res2, ok := c.lru.Get("hi")
 	if !ok {
 		t.Error("Error: could not find key")
 	}
@@ -43,5 +46,26 @@ func TestIsExpired(t *testing.T) {
 	exp2 := c.IsExpired(item2)
 	if !exp2 {
 		t.Error("Error: stale key not expired")
+	}
+}
+
+func TestLookup(t *testing.T) {
+	c := SetupAndSeedCache(5, 5*time.Second)
+
+	tests := []struct {
+		key    string
+		value  string
+		exists bool
+	}{
+		{"hello", "world", true},
+		{"hi", "there", true},
+		{"california", "", false},
+	}
+
+	for _, test := range tests {
+		v, ok := c.Lookup(test.key)
+		if (v != test.value) || (ok != test.exists) {
+			t.Errorf("Error: expected value %v and bool %v, got value %v and bool %v", test.value, test.exists, v, ok)
+		}
 	}
 }

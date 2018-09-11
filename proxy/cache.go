@@ -10,7 +10,7 @@ import (
 // Cache implements Hashicorp's LRU cache with an expiry field
 // that is used to expire keys past a certain time
 type Cache struct {
-	cache  *lru.Cache
+	lru    *lru.Cache
 	expiry time.Duration
 }
 
@@ -28,7 +28,7 @@ func NewCache(size int, expiry time.Duration) *Cache {
 		log.Fatal("Error creating cache")
 	}
 	return &Cache{
-		cache:  lru,
+		lru:    lru,
 		expiry: expiry,
 	}
 }
@@ -42,8 +42,18 @@ func (c *Cache) IsExpired(ci CachedItem) bool {
 	return true
 }
 
-/*
+// Lookup checks whether a key:value is cached and fresh.
+// If the key is cached, Lookup returns the value and true,
+// the empty string and false otherwise.
 func (c *Cache) Lookup(key string) (string, bool) {
-	c.cache.Get(key)
+	v, ok := c.lru.Get(key)
+	if !ok {
+		return "", false
+	}
+	item := v.(CachedItem)
+	if c.IsExpired(item) {
+		return "", false
+	}
+	value := item.value
+	return value, true
 }
-*/
