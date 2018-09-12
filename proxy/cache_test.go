@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// SetupAndSeedCache creates and seeds a cache for testing.
 func SetupAndSeedCache(cap int, exp time.Duration) *Cache {
 	c := NewCache(cap, exp)
 	c.lru.Add("hello",
