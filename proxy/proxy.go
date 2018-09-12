@@ -1,7 +1,6 @@
 package proxy
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/mediocregopher/radix.v2/redis"
@@ -26,11 +25,9 @@ func NewRedisProxy(c *Cache, rc *redis.Client) *RedisProxy {
 func (rp *RedisProxy) FetchFromRedis(key string) (string, bool) {
 	v, err := rp.redisClient.Cmd("GET", key).Str()
 	if err != nil {
-		fmt.Printf("Error fetching from Redis: %v", err)
 		return "", false
 	}
 	if v == "" {
-		fmt.Println("Error: key not found")
 		return "", false
 	}
 	rp.cache.lru.Add(key, CachedItem{value: v, createdAt: time.Now()})
