@@ -8,14 +8,14 @@ import (
 )
 
 // Cache implements Hashicorp's LRU cache with an expiry field
-// that is used to expire keys past a certain time
+// that is used to expire keys past a certain time.
 type Cache struct {
 	lru    *lru.Cache
 	expiry time.Duration
 }
 
 // CachedItem is the object to be cached, where value is the
-// value stored in Redis and createdAt is used to expire keys
+// value stored in Redis and createdAt is used to expire keys.
 type CachedItem struct {
 	value     string
 	createdAt time.Time
@@ -34,7 +34,7 @@ func NewCache(size int, expiry time.Duration) *Cache {
 }
 
 // IsExpired checks whether a given item in the cache is stale
-// or fresh
+// or fresh.
 func (c *Cache) IsExpired(ci CachedItem) bool {
 	if time.Now().Sub(ci.createdAt) < c.expiry {
 		return false
